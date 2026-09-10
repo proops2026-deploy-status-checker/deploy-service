@@ -26,7 +26,7 @@ model Deploy {
   environment Environment
   version   String
   status    DeployStatus @default(STARTED)
-  ciRunId   String       @map("ci_run_id")
+  ciRunId   String       @unique @map("ci_run_id")
   reason    String?
   createdAt DateTime     @default(now()) @map("created_at")
   updatedAt DateTime     @updatedAt @map("updated_at")

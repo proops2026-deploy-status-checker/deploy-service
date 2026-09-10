@@ -1,13 +1,22 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { DeployStatus, Prisma, PrismaClient } from "@prisma/client";
 import { createClient } from "redis";
 
 const app = express();
 const port = process.env.PORT ?? 3001;
 const prisma = new PrismaClient();
-const redis = createClient({ url: process.env.REDIS_URL, socket: { connectTimeout: 500 } });
+const redis = createClient({
+  url: process.env.REDIS_URL,
+  socket: { connectTimeout: 500, reconnectStrategy: false }
+});
 const overviewCacheKey = "deploy-service:overview:v1";
 const overviewCacheTtlSeconds = 30;
+const allowedTransitions: Record<DeployStatus, readonly DeployStatus[]> = {
+  STARTED: ["SUCCESS", "FAILED"],
+  SUCCESS: ["ROLLED_BACK"],
+  FAILED: ["ROLLED_BACK"],
+  ROLLED_BACK: []
+};
 redis.on("error", () => undefined);
 
 app.use(express.json());
@@ -60,7 +69,19 @@ app.post("/deploys", async (req, res) => {
     return;
   }
 
-  const deploy = await prisma.deploy.create({ data: { service, environment, version, ciRunId } });
+  let deploy;
+  try {
+    deploy = await prisma.deploy.create({ data: { service, environment, version, ciRunId } });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      const duplicate = await prisma.deploy.findUnique({ where: { ciRunId } });
+      if (duplicate) {
+        res.status(200).json(duplicate);
+        return;
+      }
+    }
+    throw error;
+  }
   const client = await availableRedis();
   if (client) {
     try {
@@ -70,6 +91,38 @@ app.post("/deploys", async (req, res) => {
     }
   }
   res.status(201).json(deploy);
+});
+
+app.patch("/deploys/:id", async (req, res) => {
+  const { status, reason } = req.body ?? {};
+  if (!Object.hasOwn(allowedTransitions, status)) {
+    res.status(400).json({ error: "status must be STARTED, SUCCESS, FAILED, or ROLLED_BACK" });
+    return;
+  }
+  if ((status === "FAILED" || status === "ROLLED_BACK") && typeof reason !== "string") {
+    res.status(400).json({ error: "reason is required for FAILED and ROLLED_BACK" });
+    return;
+  }
+
+  const deploy = await prisma.deploy.findUnique({ where: { id: req.params.id } });
+  if (!deploy) {
+    res.status(404).json({ error: "Deploy not found" });
+    return;
+  }
+  if (!allowedTransitions[deploy.status].includes(status)) {
+    res.status(409).json({ error: "Invalid deploy status transition" });
+    return;
+  }
+
+  const updated = await prisma.deploy.update({
+    where: { id: deploy.id },
+    data: { status, reason: typeof reason === "string" ? reason : null }
+  });
+  const client = await availableRedis();
+  if (client) {
+    try { await redisCommand(client.del(overviewCacheKey)); } catch { markRedisUnavailable(); }
+  }
+  res.json(updated);
 });
 
 app.get("/overview", async (_req, res) => {
