@@ -1,6 +1,7 @@
 import express from "express";
-import { DeployStatus, Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { createClient } from "redis";
+import { allowedTransitions, isEnvironment } from "./state-machine";
 
 const app = express();
 const port = process.env.PORT ?? 3001;
@@ -11,19 +12,9 @@ const redis = createClient({
 });
 const overviewCacheKey = "deploy-service:overview:v1";
 const overviewCacheTtlSeconds = 30;
-const allowedTransitions: Record<DeployStatus, readonly DeployStatus[]> = {
-  STARTED: ["SUCCESS", "FAILED"],
-  SUCCESS: ["ROLLED_BACK"],
-  FAILED: ["ROLLED_BACK"],
-  ROLLED_BACK: []
-};
 redis.on("error", () => undefined);
 
 app.use(express.json());
-
-function isEnvironment(value: unknown): value is "dev" | "staging" | "prod" {
-  return value === "dev" || value === "staging" || value === "prod";
-}
 
 async function availableRedis() {
   try {
