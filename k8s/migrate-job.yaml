@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-service-migrate
+  namespace: deploy-status-checker
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: deploy-status-checker/deploy-service-migrate:local
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: deploy-service-cm
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: deploy-service-secret
+                  key: DATABASE_URL

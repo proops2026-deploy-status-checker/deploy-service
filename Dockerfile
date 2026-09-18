@@ -15,6 +15,9 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build
 
+FROM builder AS migrator
+CMD ["npx", "prisma", "migrate", "deploy"]
+
 # --- runtime stage ---
 FROM node:24-alpine AS runtime
 ENV NODE_ENV=production
