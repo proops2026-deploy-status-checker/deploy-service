@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: deploy-service
+  namespace: deploy-status-checker
+spec:
+  selector:
+    app: deploy-service
+  ports:
+    - port: 3001
+      targetPort: 3001
