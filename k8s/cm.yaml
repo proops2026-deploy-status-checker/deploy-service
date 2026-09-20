@@ -5,4 +5,3 @@ metadata:
   namespace: deploy-status-checker
 data:
   PORT: "3001"
-  REDIS_URL: "redis://redis:6379"
