@@ -10,7 +10,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: migrate
-          image: deploy-status-checker/deploy-service-migrate:local
+          image: 241533152550.dkr.ecr.us-west-2.amazonaws.com/deploy-service-migrate:v1
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
