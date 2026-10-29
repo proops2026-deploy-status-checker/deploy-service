@@ -42,7 +42,7 @@ jobs:
     needs: [lint, test, audit]
     runs-on: ubuntu-latest
     env:
-      PUSH_IMAGE: ${{ github.event_name == 'push' }} # TEMP for Day 24 testing — restore "&& github.ref == 'refs/heads/master'" before merge
+      PUSH_IMAGE: true # TEMP for Day 24 testing — restore "${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}" before merge
     steps:
       - uses: actions/checkout@v4
 
@@ -64,7 +64,7 @@ jobs:
 
   deploy:
     needs: [build-image]
-    if: github.event_name == 'push' # TEMP for Day 24 testing — restore "&& github.ref == 'refs/heads/master'" before merge
+    if: true # TEMP for Day 24 testing — restore "github.event_name == 'push' && github.ref == 'refs/heads/master'" before merge
     runs-on: ubuntu-latest
     env:
       NAMESPACE: deploy-status-checker
