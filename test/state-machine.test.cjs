@@ -10,7 +10,7 @@ test("TIE-20 release-flow state machine — allowed transitions (IRD-001 §6)", 
 });
 
 test("TIE-20 release-flow state machine — disallowed transitions", () => {
-  assert.equal(canTransition("STARTED", "ROLLED_BACK"), true); // DELIBERATELY WRONG — Day 24 failure drill
+  assert.equal(canTransition("STARTED", "ROLLED_BACK"), false);
   assert.equal(canTransition("SUCCESS", "FAILED"), false);
   assert.equal(canTransition("SUCCESS", "STARTED"), false);
   assert.equal(canTransition("FAILED", "SUCCESS"), false);
