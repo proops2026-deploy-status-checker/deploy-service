@@ -15,3 +15,11 @@ export function canTransition(from: DeployStatus, to: DeployStatus): boolean {
 export function isEnvironment(value: unknown): value is "dev" | "staging" | "prod" {
   return value === "dev" || value === "staging" || value === "prod";
 }
+
+// Day 26 drill: shipped intentionally WITHOUT a test to trip the coverage gate.
+export function describeTransition(from: DeployStatus, to: DeployStatus): string {
+  if (canTransition(from, to)) {
+    return `Transition ${from} -> ${to} is allowed`;
+  }
+  return `Transition ${from} -> ${to} is NOT allowed`;
+}
