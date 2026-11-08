@@ -12,6 +12,7 @@
     "dev": "ts-node src/index.ts",
     "lint": "eslint .",
     "test": "npm run build && node --test test/state-machine.test.cjs",
+    "test:coverage": "npm run build && c8 --reporter=lcov --reporter=text node --test test/state-machine.test.cjs",
     "prisma:generate": "prisma generate"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
+    "c8": "^10.1.3",
     "eslint": "^10.10.0",
     "globals": "^17.12.0",
     "prisma": "^6.1.0",
