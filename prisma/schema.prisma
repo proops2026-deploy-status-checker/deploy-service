@@ -21,15 +21,23 @@ enum DeployStatus {
 }
 
 model Deploy {
-  id        String       @id @default(uuid())
-  service   String
+  id          String       @id @default(uuid())
+  service     String
   environment Environment
-  version   String
-  status    DeployStatus @default(STARTED)
-  ciRunId   String       @unique @map("ci_run_id")
-  reason    String?
-  createdAt DateTime     @default(now()) @map("created_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
+  version     String
+  status      DeployStatus @default(STARTED)
+  ciRunId     String       @unique @map("ci_run_id")
+  reason      String?
+  // Traceability for on-call (DOP-001 §1): which commit, which CI run, who triggered it.
+  commitSha   String?      @map("commit_sha")
+  ciRunUrl    String?      @map("ci_run_url")
+  triggeredBy String?      @map("triggered_by")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
 
+  // GET /deploys: keyset pagination, newest first.
+  @@index([createdAt(sort: Desc), id(sort: Desc)])
+  // GET /overview: SELECT DISTINCT ON (service, environment) ... ORDER BY created_at DESC.
+  @@index([service, environment, createdAt(sort: Desc)])
   @@map("deploys")
 }

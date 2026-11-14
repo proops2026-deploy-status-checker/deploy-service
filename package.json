@@ -11,14 +11,15 @@
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "lint": "eslint .",
-    "test": "npm run build && node --test test/state-machine.test.cjs",
-    "test:coverage": "npm run build && c8 --reporter=lcov --reporter=text node --test test/state-machine.test.cjs",
+    "test": "npm run build && node --test test/*.test.cjs",
+    "test:coverage": "npm run build && c8 --reporter=lcov --reporter=text node --test test/*.test.cjs",
     "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
     "express": "^5.1.0",
-    "redis": "^6.2.1"
+    "redis": "^6.2.1",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
