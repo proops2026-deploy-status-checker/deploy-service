@@ -28,3 +28,13 @@ test("TIE-20 isEnvironment validates dev/staging/prod only", () => {
   assert.equal(isEnvironment(undefined), false);
   assert.equal(isEnvironment(123), false);
 });
+
+test("DSC-03 sourcesFor lists the statuses that may move to a target", () => {
+  const { sourcesFor, requiresReason } = require("../dist/state-machine.js");
+  assert.deepEqual(sourcesFor("SUCCESS"), ["STARTED"]);
+  assert.deepEqual(sourcesFor("FAILED"), ["STARTED"]);
+  assert.deepEqual(sourcesFor("ROLLED_BACK"), ["SUCCESS", "FAILED"]);
+  assert.deepEqual(sourcesFor("STARTED"), []);
+  assert.equal(requiresReason("FAILED"), true);
+  assert.equal(requiresReason("SUCCESS"), false);
+});
