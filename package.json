@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "test": "npm run build && node --test test/*.test.cjs",
     "test:coverage": "npm run build && c8 --reporter=lcov --reporter=text node --test test/*.test.cjs",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
