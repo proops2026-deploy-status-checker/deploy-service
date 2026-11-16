@@ -11,13 +11,13 @@ export interface AppDependencies {
 }
 
 // Cache calls are best-effort: a cache bug must never fail a request (NFR-5).
-// async function safely<T>(operation: () => Promise<T>, fallback: T): Promise<T> {
-//   try {
-//     return await operation();
-//   } catch {
-//     return fallback;
-//   }
-// }
+async function safely<T>(operation: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await operation();
+  } catch {
+    return fallback;
+  }
+}
 
 export function createApp({ repo, cache }: AppDependencies) {
   const app = express();
