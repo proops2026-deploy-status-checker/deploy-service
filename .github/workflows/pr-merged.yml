@@ -27,4 +27,5 @@ jobs:
       image-tag: ${{ needs.app-ci.outputs.image-tag }}
       service-name: deploy-service
       app-secret-keys: DATABASE_URL REDIS_URL
+      runs-on: '["self-hosted", "duc-local"]' # own runner + own minikube, independent of Tien's cluster
     secrets: inherit # env secrets resolve only inside the job that declares environment: dev

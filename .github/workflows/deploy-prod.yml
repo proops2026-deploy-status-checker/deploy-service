@@ -15,4 +15,5 @@ jobs:
       image-tag: ${{ inputs.image-tag }}
       service-name: deploy-service
       app-secret-keys: DATABASE_URL REDIS_URL
+      runs-on: '["self-hosted", "duc-local"]' # own runner + own minikube, independent of Tien's cluster
     secrets: inherit
