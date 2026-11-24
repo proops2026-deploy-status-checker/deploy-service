@@ -1,0 +1,18 @@
+name: Deploy Staging (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      image-tag:
+        description: "Full commit SHA to promote (copy from the build run summary)"
+        type: string
+        required: true
+jobs:
+  deploy:
+    uses: proops2026-deploy-status-checker/proops2026-cicd-platform/.github/workflows/reusable-deploy.yml@v2
+    with:
+      environment: staging
+      image-name: tert62/dsc-deploy-service
+      image-tag: ${{ inputs.image-tag }}
+      service-name: deploy-service
+      app-secret-keys: DATABASE_URL REDIS_URL
+    secrets: inherit

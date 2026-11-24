@@ -2,7 +2,6 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: deploy-service-migrate
-  namespace: deploy-status-checker
 spec:
   backoffLimit: 2
   template:

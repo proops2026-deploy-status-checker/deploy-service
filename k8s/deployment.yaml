@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deploy-service
-  namespace: deploy-status-checker
   labels:
     app: deploy-service
 spec:
@@ -39,9 +38,18 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           readinessProbe:
             httpGet:
               path: /health
               port: 3001
             initialDelaySeconds: 10
             periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 15
+            periodSeconds: 20
